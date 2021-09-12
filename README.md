@@ -10,7 +10,7 @@
 | Laptop User | 192.168.1.10/24 | Ethernet | 192.168.1.0/24 |
 
 # Soal dapat diunduh pada link berikut:
-### [Soal 1](https://github.com/espin2/docker_dns/tree/main/Soal%201)
+### [Soal 1](https://github.com/espin2/docker_dns/blob/main/SOAL%20SIJA.docx?raw=true)
 # Jawaban dapat dilihat pada link berikut:
 ### [Soal 1](https://github.com/espin2/docker_dns/tree/main/Soal%201)
 ### [Soal 2 ](https://github.com/espin2/docker_dns/tree/main/Soal%202)
