@@ -1,12 +1,73 @@
+
 # Environment
 Server1  <br>
 ip: 192.168.9.61 <br>
 domain: sija.com
 
+# prerequisite 
+## Router 1
+```
+Router>enable
+Router#config t
+Router(config)#int fa0/0
+Router(config-if)#ip address 10.10.10.2 255.255.255.252
+Router(config-if)#int fa0/1
+Router(config-if)#ip address 172.18.251.1 255.255.255.248
+```
+## Router 2
+```
+Router>enable
+Router#config t
+Router(config)#int fa0/0
+Router(config-if)#ip address 10.10.10.1 255.255.255.252
+Router(config-if)#int fa0/1
+Router(config-if)#ip address 192.168.1.1 255.255.255.0
+```
+## Docker Server
+```nano /etc/netplan/50-cloud-init.yaml```
+```
+network:
+  version: 2
+  ethernets:
+    enp0s3:
+      addresses:
+      - 10.88.88.50/24
+      gateway4: 10.88.88.1
+      nameservers:
+           addresses: [8.8.8.8, 1.1.1.1]
+```
+## Haproxy Server
+```nano /etc/netplan/50-cloud-init.yaml```
+```
+network:
+  version: 2
+  ethernets:
+    enp0s3:
+      addresses:
+      - 10.88.88.50/24
+      gateway4: 10.88.88.1
+      nameservers:
+           addresses: [8.8.8.8, 1.1.1.1]
+```
+## DNS Server
+```nano /etc/netplan/50-cloud-init.yaml```
+```
+network:
+  version: 2
+  ethernets:
+    enp0s3:
+      addresses:
+      - 10.88.88.50/24
+      gateway4: 10.88.88.1
+      nameservers:
+           addresses: [8.8.8.8, 1.1.1.1]
+```
+
 # install bind9 dan haproxy
 ```apt install haproxy bind9 -y```
 
 # konfigurasi dns
+## DNS Server
 1.konfigurasi zone dns sija.com
 
 ```nano /etc/bind/named.conf.local```
@@ -50,8 +111,10 @@ nameserver 172.18.251.2
 ```
 5.restart bind9 <br>
 ```systemctl restart bind9```
+# konfigurasi haproxy
+## Haproxy Server
 
-6.konfigurasi haproxy <br>
+1.konfigurasi haproxy <br>
 ```nano /etc/haproxy/haproxy.cfg```
 ```
 
@@ -72,12 +135,17 @@ backend web_web1
         server es-docker 192.168.9.61:8081 check
 ```
 
-7.restart haproxy <br>
+2.restart haproxy <br>
 ```systemctl restart haproxy```
 
-8.Docker wordpress
+# konfigurasi Wordpress dan web sederhana
+## Docker Server
+### Wordpress
 
+1.buat folder dan masuk ke folder wordpress
 ```mkdir wordpress && cd wordpress``` <br>
+
+2.edit file docker-compose.yaml<br>
 ```nano docker-compose.yaml```
 
 ```
@@ -113,82 +181,36 @@ volumes:
   wordpress:
 
 ```
-9.Dockerfile<br>
-```mkdir myweb1 && cd myweb1``` <br>
-```echo “Selamat Datang di Website Saya” >> index.html``` <br>
+3.jalankan docker-compose agar container terbuat. <br>
+```docker-compose up -d```<br>
 
-```nano Dockerfile``` <br>
+### Web Sederhana
+1.buat folder dan masuk ke folder myweb1 <br>
+```mkdir myweb1 && cd myweb1```<br>
+
+2.buat tulisan web sederhana di index.html <br>
+```echo “Selamat Datang di Website Saya” >> index.html```<br>
+
+3.edit file Dockerfile <br>
+```nano Dockerfile``` 
 ```
 FROM httpd:latest
 WORKDIR /usr/local/apache2/htdocs
 COPY index.html /usr/local/apache2/htdocs
 ```
+4.build image dari Dockerfile yang telah dibuat <br> 
 ```docker image build -t myweb1 .``` <br>
+
+5.verifikasi images telah terbuat<br>
 ```docker images ls``` <br>
+
+6.jalankan container menggunakan image yang telah dibuat<br>
 ```docker run -d -p 8081:80 myweb1``` <br>
-```docker-compose up -d``` <br>
 
-# preqeusite ip
-cisco
-router1
-```
-Router>enable
-Router#config t
-Router(config)#int fa0/0
-Router(config-if)#ip address 10.10.10.2 255.255.255.252
-Router(config-if)#int fa0/1
-Router(config-if)#ip address 172.18.251.1 255.255.255.248
-```
-router2
-```
-Router>enable
-Router#config t
-Router(config)#int fa0/0
-Router(config-if)#ip address 10.10.10.1 255.255.255.252
-Router(config-if)#int fa0/1
-Router(config-if)#ip address 192.168.1.1 255.255.255.0
-```
-ip docker server <br>
-```nano /etc/netplan/50-cloud-init.yaml```
-```
-network:
-  version: 2
-  ethernets:
-    enp0s3:
-      addresses:
-      - 10.88.88.50/24
-      gateway4: 10.88.88.1
-      nameservers:
-           addresses: [8.8.8.8, 1.1.1.1]
-```
-ip haproxy<br>
-```nano /etc/netplan/50-cloud-init.yaml```
-```
-network:
-  version: 2
-  ethernets:
-    enp0s3:
-      addresses:
-      - 10.88.88.50/24
-      gateway4: 10.88.88.1
-      nameservers:
-           addresses: [8.8.8.8, 1.1.1.1]
-```
-ip dns server<br>
-```nano /etc/netplan/50-cloud-init.yaml```
-```
-network:
-  version: 2
-  ethernets:
-    enp0s3:
-      addresses:
-      - 10.88.88.50/24
-      gateway4: 10.88.88.1
-      nameservers:
-           addresses: [8.8.8.8, 1.1.1.1]
-```
-# Routing OSPF
 
+
+# konfigurasi Routing OSPF
+## Router1
 Router1 <br>
 ```
 Router>enable
@@ -197,7 +219,7 @@ Router(config)#router ospf 1
 Router(config-router)#network 10.10.10.0 0.0.0.3 area 0
 Router(config-router)#network 172.18.251.0 0.0.0.7 area 0
 ```
-Router2 <br>
+## Router2
 ```
 Router>enable
 Router#config t
@@ -206,8 +228,8 @@ Router(config-router)#network 10.10.10.0 0.0.0.3 area 0
 Router(config-router)#network 192.168.1.0 0.0.0.255 area 0
 ```
 
-# ACL
-Router 1
+# Konfigurasi ACL
+## Router1
 ```
 Router(config)access-list 100 deny ip host 192.168.1.10 host 172.18.251.4
 Router(config)access-list 100 permit ip any any
