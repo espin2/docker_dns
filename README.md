@@ -17,3 +17,5 @@
 ### [Soal 3](https://github.com/espin2/docker_dns/tree/main/Soal%203)
 ### [Soal 4](https://github.com/espin2/docker_dns/tree/main/Soal%204)
 ### [Soal 5](https://github.com/espin2/docker_dns/tree/main/Soal%205)
+### [Soal 6](https://github.com/espin2/docker_dns/tree/main/Soal%206)
+
